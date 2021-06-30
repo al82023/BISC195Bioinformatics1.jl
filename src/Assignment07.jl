@@ -3,7 +3,8 @@ module Assignment07
 export normalizeDNA,
         composition,
         gc_content,
-        complement
+        complement,
+        reverse_complement
 
 # # uncomment the following line if you intend to use BioSequences types
 # using BioSequences
@@ -151,6 +152,42 @@ function complement(sequence::AbstractString)
     seq = normalizeDNA(sequence)
     comp = map(complement, seq)
     return comp
+end
+
+"""
+    reverse_complement(sequence)
+
+Takes a DNA sequence and returns the reverse complement
+of that sequence.
+
+Takes lowercase or uppercase sequences,
+but always returns uppercase.
+
+Examples
+≡≡≡≡≡≡≡≡≡≡
+
+    julia> reverse_complement("AAATTT")
+    "AAATTT"
+
+    julia> reverse_complement("GCAT")
+    "ATGC"
+
+    julia> rc = reverse_complement("TTGGG");
+
+    julia> println(rc)
+    CCCAA
+
+    julia> reverse_complement("ATTAGC")
+    "GCTAAT"
+
+    julia> reverse_complement("ATN")
+    "NAT"
+"""
+function reverse_complement(sequence)
+    seq = normalizeDNA(sequence)
+    comp = map(complement, seq)
+    reversecomp = reverse(comp)
+    return reversecomp
 end
 
 end # module Assignment07
