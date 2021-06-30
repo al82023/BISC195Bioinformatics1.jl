@@ -2,7 +2,8 @@ module Assignment07
 
 export normalizeDNA,
         composition,
-        gc_content
+        gc_content,
+        complement
 
 # # uncomment the following line if you intend to use BioSequences types
 # using BioSequences
@@ -27,13 +28,15 @@ end
 # Your code here.
 # Don't forget to export your functions!
 
-
 """
     composition(sequence)
+
 Counts the number of each type of base (including 'N')
 in a DNA sequence and returns a Dict
+
 Examples  
 ≡≡≡≡≡≡≡≡≡≡
+
     julia> composition("ACCGGGTTTTN")
     Dict{Char,Int64} with 5 entries:
         'A' => 1
@@ -67,25 +70,81 @@ end
 
 """
     gc_content(sequence)
+
 Calculates the GC ratio of a DNA sequence.
 The GC ratio is the total number of G and C bases divided by the total length of the sequence.
-For more info about GC content, see here:
+
 Examples  
 ≡≡≡≡≡≡≡≡≡≡
+
     julia> gc_content("AATG")
     0.25
+
     julia> gc_content("cccggg") * 100
     100.0
+
     julia> gc_content("ATta")
     0.0
+
     julia> gc_content("ATty")
     Error: Invalid base Y encountered
+
     julia> gc_content("ATCGN")
     0.4
 """
 function gc_content(sequence)
     basecomp = composition(sequence)
     return (basecomp['G'] + basecomp['C']) / length(sequence)
+end
+
+# Not Exported
+"""
+    complementbase(base)
+
+Get the DNA complement of the provided base:
+
+    A <-> T
+    G <-> C
+
+Accepts uppercase or lowercase `String` or `Char`,
+but always returns an uppercase `Char`.
+If a valid base is not provided, the function throws an error.
+"""
+function complementbase(base)
+    complements = Dict("A" => 'T',
+                       "T" => 'A',
+                       "G" => 'C',
+                       "C" => 'G',
+                       "N" => 'N')
+    
+    base = uppercase(string(base))
+    
+    !(base in keys(complements)) && error("Invalid base $base")
+    return complements[base]
+end
+
+"""
+    complement(sequence)
+
+Takes a DNA sequence and returns the complement
+of that sequence.
+
+Takes lowercase or uppercase sequences,
+but always returns uppercase.
+
+Examples
+≡≡≡≡≡≡≡≡≡≡
+
+    julia> complement("ATTN")
+    "TAAN"
+
+    julia> complement("ATTAGC")
+    "TAATCG"
+"""
+function complement(sequence)
+    seq = normalizeDNA(sequence)
+    comp = map(complementbase, seq)
+    return comp
 end
 
 end # module Assignment07
