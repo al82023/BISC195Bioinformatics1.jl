@@ -99,7 +99,7 @@ end
 
 # Not Exported
 """
-    complementbase(base)
+    complement(base::Char)
 
 Get the DNA complement of the provided base:
 
@@ -109,8 +109,14 @@ Get the DNA complement of the provided base:
 Accepts uppercase or lowercase `String` or `Char`,
 but always returns an uppercase `Char`.
 If a valid base is not provided, the function throws an error.
+
+Examples
+≡≡≡≡≡≡≡≡≡≡
+
+    julia> complement('C')
+    'G': ASCII/Unicode U+0047 (category Lu: Letter, uppercase)
 """
-function complementbase(base)
+function complement(base::Char)
     complements = Dict("A" => 'T',
                        "T" => 'A',
                        "G" => 'C',
@@ -124,7 +130,7 @@ function complementbase(base)
 end
 
 """
-    complement(sequence)
+    complement(sequence::AbstractString)
 
 Takes a DNA sequence and returns the complement
 of that sequence.
@@ -141,9 +147,9 @@ Examples
     julia> complement("ATTAGC")
     "TAATCG"
 """
-function complement(sequence)
+function complement(sequence::AbstractString)
     seq = normalizeDNA(sequence)
-    comp = map(complementbase, seq)
+    comp = map(complement, seq)
     return comp
 end
 
