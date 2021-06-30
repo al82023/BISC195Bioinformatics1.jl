@@ -4,7 +4,8 @@ export normalizeDNA,
         composition,
         gc_content,
         complement,
-        reverse_complement
+        reverse_complement,
+        parse_fasta
 
 # # uncomment the following line if you intend to use BioSequences types
 # using BioSequences
@@ -53,7 +54,6 @@ function composition(sequence)
     sequence = normalizeDNA(sequence)
     comp = Dict('A' => 0, 'C' => 0, 'G' => 0, 'T' => 0, 'N' => 0)
     for base in sequence
-        # add 1 to each base as it occurs
         if base == 'A'
             comp['A'] = comp['A'] + 1
         elseif base == 'C'
@@ -98,7 +98,6 @@ function gc_content(sequence)
     return (basecomp['G'] + basecomp['C']) / length(sequence)
 end
 
-# Not Exported
 """
     complement(base::Char)
 
@@ -123,9 +122,7 @@ function complement(base::Char)
                        "G" => 'C',
                        "C" => 'G',
                        "N" => 'N')
-    
     base = uppercase(string(base))
-    
     !(base in keys(complements)) && error("Invalid base $base")
     return complements[base]
 end
@@ -188,6 +185,50 @@ function reverse_complement(sequence)
     comp = map(complement, seq)
     reversecomp = reverse(comp)
     return reversecomp
+end
+
+"""
+    function parse_fasta(path)
+
+Reads a fasta-formated file and returns 2 vectors,
+one containing headers,
+the other containing the entire sequence as a `String`.
+
+Examples
+≡≡≡≡≡≡≡≡≡
+
+    julia> ex1 = parse_fasta("data/ex1.fasta");
+
+    julia> ex1[1]
+    2-element Array{String,1}:
+    "ex1.1 | easy"
+    "ex1.2 | multiline"
+
+    julia> ex1[2]
+    2-element Array{String,1}:
+    "AATTATAGC"
+    "CGCCCCCCAGTCGGATT"
+
+    julia> ex2 = parse_fasta("data/ex2.fasta");
+    ERROR: invalid base H
+"""
+function parse_fasta(path)
+    headers = String[]
+    sequences = String[]
+    sequence = []
+    for line in eachline(path)
+        if occursin('>', line)
+            push!(headers, chop(line, head = 1, tail = 0))
+            push!(sequences, join(sequence))
+            sequence = []
+        else
+            push!(sequence, line)
+        end
+    end
+    push!(sequences, join(sequence))
+    popfirst!(sequences)
+    normalizeDNA.(sequences)
+    return (headers, sequences)
 end
 
 end # module Assignment07
